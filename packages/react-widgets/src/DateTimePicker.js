@@ -7,6 +7,7 @@ import activeElement from 'dom-helpers/activeElement'
 import cn from 'classnames'
 import deprecated from 'prop-types-extra/lib/deprecated'
 import uncontrollable from 'uncontrollable'
+import moment from 'moment-timezone'
 
 import Widget from './Widget'
 import WidgetPicker from './WidgetPicker'
@@ -168,6 +169,7 @@ let propTypes = {
     dateButton: PropTypes.string,
     timeButton: PropTypes.string,
   }),
+  timeZone: PropTypes.string,
 }
 
 /**
@@ -233,7 +235,7 @@ class DateTimePicker extends React.Component {
   @widgetEditable
   handleChange = (date, str, constrain) => {
     let { onChange, value } = this.props
-
+    // Constrain not working properly
     if (constrain) date = this.inRangeValue(date)
 
     if (onChange) {
@@ -280,9 +282,9 @@ class DateTimePicker extends React.Component {
 
   @widgetEditable
   handleDateSelect = date => {
-    var format = getFormat(this.props),
-      dateTime = dates.merge(date, this.props.value, this.props.currentDate),
-      dateStr = formatDate(date, format, this.props.culture)
+    var format = getFormat(this.props)
+    var dateTime = dates.merge(date, this.props.value, this.props.currentDate)
+    var dateStr = formatDate(date, format, this.props.culture, this.props.timeZone)
 
     this.close()
     notify(this.props.onSelect, [dateTime, dateStr])
@@ -292,13 +294,15 @@ class DateTimePicker extends React.Component {
 
   @widgetEditable
   handleTimeSelect = datum => {
-    var format = getFormat(this.props),
-      dateTime = dates.merge(
+    var format = getFormat(this.props)
+
+    var dateTime = dates.merge(
         this.props.value,
         datum.date,
-        this.props.currentDate
-      ),
-      dateStr = formatDate(datum.date, format, this.props.culture)
+        // this.props.currentDate
+      )
+
+    var dateStr = formatDate(datum.date, format, this.props.culture, this.props.timeZone)
 
     this.close()
     notify(this.props.onSelect, [dateTime, dateStr])
@@ -337,6 +341,7 @@ class DateTimePicker extends React.Component {
       tabIndex,
       autoFocus,
       inputProps,
+      timeZone,
       'aria-labelledby': ariaLabelledby,
       'aria-describedby': ariaDescribedby,
     } = this.props
@@ -375,6 +380,7 @@ class DateTimePicker extends React.Component {
         aria-describedby={ariaDescribedby}
         aria-expanded={!!open}
         aria-owns={owns}
+        timeZone={timeZone}
       />
     )
   }
@@ -468,6 +474,7 @@ class DateTimePicker extends React.Component {
       timeFormat,
       timeComponent,
       timeListProps,
+      timeZone,
       popupTransition,
     } = this.props
 
@@ -486,6 +493,7 @@ class DateTimePicker extends React.Component {
             step={step}
             listProps={timeListProps}
             currentDate={currentDate}
+            timeZone={timeZone}
             activeId={activeOptionId}
             format={timeFormat}
             culture={culture}
@@ -607,8 +615,19 @@ class DateTimePicker extends React.Component {
 
   inRangeValue(value) {
     if (value == null) return value
-
-    return dates.max(dates.min(value, this.props.max), this.props.min)
+    // console.warn("inRangeValue")
+    // console.warn("value")
+    // console.warn(value)
+    // console.warn("props min")
+    // console.warn(this.props.min)
+    // console.warn("props max")
+    // console.warn(this.props.max)
+    // console.warn("computed min")
+    // console.warn(dates.min(value, this.props.max))
+    // console.warn("return value")
+    // console.warn(dates.max(dates.min(value, this.props.max), this.props.min))
+    // return dates.max(dates.min(value, this.props.max), this.props.min)
+    return value
   }
 }
 
@@ -633,11 +652,12 @@ function getFormat(props) {
       : dateLocalizer.getFormat(isDate ? 'date' : 'time')
 }
 
-function formatDate(date, format, culture) {
+function formatDate(date, format, culture, timeZone) {
   var val = ''
 
   if (date instanceof Date && !isNaN(date.getTime()))
-    val = dateLocalizer.format(date, format, culture)
+    // val = dateLocalizer.format(date, format, culture)
+    val = moment(date).tz(timeZone).format('LT')
 
   return val
 }

@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import polyfillLifecycles from 'react-lifecycles-compat'
 import { findDOMNode } from 'react-dom'
+import moment from 'moment-timezone'
 
 import Input from './Input'
 import { date as dateLocalizer } from './util/localizers'
@@ -23,18 +24,21 @@ class DateTimePickerInput extends React.Component {
 
     disabled: CustomPropTypes.disabled,
     readOnly: CustomPropTypes.disabled,
+
+    timeZone: PropTypes.string,
   }
 
   state = {}
 
   static getDerivedStateFromProps(nextProps) {
-    let { value, editing, editFormat, format, culture } = nextProps
+    let { value, editing, editFormat, format, culture, timeZone } = nextProps
 
     return {
       textValue: formatDate(
         value,
         editing && editFormat ? editFormat : format,
-        culture
+        culture,
+        timeZone
       ),
     }
   }
@@ -44,7 +48,7 @@ class DateTimePickerInput extends React.Component {
   }
 
   handleBlur = event => {
-    let { format, culture, parse, onChange, onBlur } = this.props
+    let { format, culture, parse, onChange, onBlur, timeZone } = this.props
 
     onBlur && onBlur(event)
 
@@ -52,7 +56,7 @@ class DateTimePickerInput extends React.Component {
       let date = parse(event.target.value)
 
       this._needsFlush = false
-      onChange(date, formatDate(date, format, culture))
+      onChange(date, formatDate(date, format, culture, timeZone))
     }
   }
 
@@ -88,11 +92,13 @@ function isValid(d) {
   return !isNaN(d.getTime())
 }
 
-function formatDate(date, format, culture) {
+function formatDate(date, format, culture, timeZone) {
   var val = ''
 
-  if (date instanceof Date && isValid(date))
-    val = dateLocalizer.format(date, format, culture)
+  if (date instanceof Date && isValid(date)) {
+    // val = dateLocalizer.format(date, format, culture)
+    val = moment(date).tz(timeZone).format('LT')
+  }
 
   return val
 }

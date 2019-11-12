@@ -1,6 +1,7 @@
 import React from 'react'
 import polyfillLifecycles from 'react-lifecycles-compat'
 import PropTypes from 'prop-types'
+import moment from 'moment-timezone'
 
 import List from './List'
 import dates from './util/dates'
@@ -21,36 +22,46 @@ const find = (arr, fn) => {
   return null
 }
 
-function getBounds({ min, max, currentDate, value }) {
-  value = dates.merge(value, value, currentDate)
-  let start = dates.startOf(
-      value,
-      'day'
-    )
-  let end = dates.add(start, 1, 'day')
-  //date parts are equal
+function getBounds({ min, max, currentDate, timeZone, value }) {
+  let start = moment.utc(currentDate).tz(timeZone, true).startOf('day').toDate()
+  let end =  moment(start).add(1, 'days').toDate()
+
   return {
-    min: dates.eq(value, min, 'day')
-      ? dates.merge(start, min, currentDate)
-      : start,
-    max: dates.eq(value, max, 'day')
-      ? dates.merge(start, max, currentDate)
-      : end,
+    min: start,
+    max: end
   }
+  //date parts are equal
+  // return {
+  //   min: dates.eq(value, min, 'day')
+  //     ? dates.merge(start, min, currentDate)
+  //     : start,
+  //   max: dates.eq(value, max, 'day')
+  //     ? dates.merge(start, max, currentDate)
+  //     : end,
+  // }
 }
 
 function getDates({ step, culture, ...props }) {
   let times = []
   let { min, max } = getBounds(props)
-  let startDay = dates.date(min)
 
-  while (dates.date(min) === startDay && dates.lte(min, max)) {
+
+  // let startDay = dates.date(min)
+
+
+  // while (dates.date(min) === startDay && dates.lte(min, max)) {
+  while (dates.lte(min, max)) {
     times.push({
-      date: min,
-      label: dateLocalizer.format(min, format(props), culture),
+      // date: moment.utc(min).tz(props.timeZone, true).toDate(),
+      date: moment.utc(min).toDate(),
+      label: moment(min).tz(props.timeZone).format('LT')
+      // label: moment.utc(min).tz(props.timeZone, true).format('LT')
+      // label: moment(min).format('LT')
     })
-    min = dates.add(min, step || 30, 'minutes')
+    // min = moment.utc(min).tz(props.timeZone, true).add(step || 30, 'minutes').toDate()
+    min = moment(min).add(step || 30, 'minutes').toDate()
   }
+  console.warn(times)
   return times
 }
 
