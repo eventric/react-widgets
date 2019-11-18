@@ -1,4 +1,5 @@
 {
+  "main": "packages/react-widgets/lib/index.js",
   "private": true,
   "engines": {
     "yarn": "^1.0.0",
