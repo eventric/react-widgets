@@ -204,6 +204,8 @@ class DateTimePicker extends React.Component {
     date: true,
     time: true,
     open: false,
+    timeZone: 'UTC',
+    currentDate: new Date()
   }
 
   constructor(...args) {
@@ -235,9 +237,12 @@ class DateTimePicker extends React.Component {
   @widgetEditable
   handleChange = (date, str, constrain) => {
     let { onChange, value } = this.props
+    // console.warn("handleChange value", value)
+    // console.warn("handleChange date", date)
     // Constrain not working properly
-    if (constrain) date = this.inRangeValue(date)
-
+    // console.warn("handleChange preConstrain", moment.utc(date).format())
+    // if (constrain) date = this.inRangeValue(date)
+    // console.warn("handleChange postConstrain", moment.utc(date).format())
     if (onChange) {
       if (date == null || value == null) {
         if (
@@ -283,8 +288,14 @@ class DateTimePicker extends React.Component {
   @widgetEditable
   handleDateSelect = date => {
     var format = getFormat(this.props)
-    var dateTime = dates.merge(date, this.props.value, this.props.currentDate)
+    // var dateTime = dates.merge(date, this.props.value, this.props.currentDate)
+    // console.warn("VALUE", this.props.value)
+    // console.warn("DATE", date)
+    // console.warn("CURRENT DATE", this.props.currentDate)
+    // console.warn("MERGE", dates.merge(date, this.props.value, this.props.currentDate))
+    var dateTime = date
     var dateStr = formatDate(date, format, this.props.culture, this.props.timeZone)
+    // console.warn("DATESTR", dateStr)
 
     this.close()
     notify(this.props.onSelect, [dateTime, dateStr])
@@ -295,15 +306,16 @@ class DateTimePicker extends React.Component {
   @widgetEditable
   handleTimeSelect = datum => {
     var format = getFormat(this.props)
-
-    var dateTime = dates.merge(
-        this.props.value,
-        datum.date,
-        // this.props.currentDate
-      )
+    // console.warn("handleTimeSelect preFormat", moment.utc(datum.date).format(), datum)
+    var dateTime = datum.date
+    // var dateTime = dates.merge(
+    //     this.props.value,
+    //     datum.date,
+    //     // this.props.currentDate
+    //   )
 
     var dateStr = formatDate(datum.date, format, this.props.culture, this.props.timeZone)
-
+    // console.warn("handleTimeSelect postFormat", moment.utc(dateTime).format(), dateStr)
     this.close()
     notify(this.props.onSelect, [dateTime, dateStr])
     this.handleChange(dateTime, dateStr, true)
@@ -342,6 +354,7 @@ class DateTimePicker extends React.Component {
       autoFocus,
       inputProps,
       timeZone,
+      currentDate,
       'aria-labelledby': ariaLabelledby,
       'aria-describedby': ariaDescribedby,
     } = this.props
@@ -354,7 +367,8 @@ class DateTimePicker extends React.Component {
     } else if (open === 'date') {
       activeId = this.activeCalendarId
     }
-
+    // console.warn('DateTimePicker/getDerivedState value', value)
+    // console.warn('DateTimePicker/getDerivedState editFormat', editFormat)
     return (
       <DateTimePickerInput
         {...inputProps}
@@ -381,6 +395,7 @@ class DateTimePicker extends React.Component {
         aria-expanded={!!open}
         aria-owns={owns}
         timeZone={timeZone}
+        currentDate={currentDate}
       />
     )
   }
@@ -424,8 +439,14 @@ class DateTimePicker extends React.Component {
       dropUp,
       onCurrentDateChange,
       currentDate,
+      timeZone
     } = this.props
 
+    // console.warn("DateTimePicker/renderCalendar: value", value)
+    // const localizedValue = isValid(value) ? moment(moment.utc(value).tz(timeZone).format('L')).toDate() : new Date()
+    // console.warn("DateTimePicker/renderCalendar: localizedValue", localizedValue)
+    // console.warn("DateTimePicker/renderCalendar: currentDate", currentDate)
+    // console.warn("DateTimePicker/renderCalendar: timeZone", timeZone)
     let calendarProps = Props.pick(this.props, Calendar.ControlledComponent)
     // manually include the last controlled default Props
     calendarProps.defaultView = this.props.defaultView
@@ -448,12 +469,13 @@ class DateTimePicker extends React.Component {
           // #75: need to aggressively reclaim focus from the calendar otherwise
           // disabled header/footer buttons will drop focus completely from the widget
           onNavigate={() => this.focus()}
-          currentDate={currentDate}
+          currentDate={value}
           onCurrentDateChange={onCurrentDateChange}
           aria-hidden={!open}
           aria-live="polite"
           aria-labelledby={inputId}
           ref={this.attachCalRef}
+          timeZone={timeZone}
         />
       </Popup>
     )
@@ -477,7 +499,10 @@ class DateTimePicker extends React.Component {
       timeZone,
       popupTransition,
     } = this.props
-
+    // console.warn("RENDER TIME LIST")
+    // console.warn(currentDate)
+    // console.warn(isValid(currentDate))
+    // console.warn(timeZone)
     return (
       <Popup
         dropUp={dropUp}
@@ -492,7 +517,7 @@ class DateTimePicker extends React.Component {
             max={max}
             step={step}
             listProps={timeListProps}
-            currentDate={currentDate}
+            currentDate={isValid(currentDate) ? currentDate : new Date()}
             timeZone={timeZone}
             activeId={activeOptionId}
             format={timeFormat}
@@ -655,9 +680,11 @@ function getFormat(props) {
 function formatDate(date, format, culture, timeZone) {
   var val = ''
 
-  if (date instanceof Date && !isNaN(date.getTime()))
+  if (isValid(date)) {
+  // if (date instanceof Date && !isNaN(date.getTime()))
     // val = dateLocalizer.format(date, format, culture)
-    val = moment(date).tz(timeZone).format('LT')
+    val = moment(date).tz(timeZone).format(format)
+  }
 
   return val
 }
@@ -665,4 +692,8 @@ function formatDate(date, format, culture, timeZone) {
 function dateOrNull(dt) {
   if (dt && !isNaN(dt.getTime())) return dt
   return null
+}
+
+function isValid(d) {
+  return d instanceof Date && !isNaN(d.getTime())
 }

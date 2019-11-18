@@ -23,45 +23,42 @@ const find = (arr, fn) => {
 }
 
 function getBounds({ min, max, currentDate, timeZone, value }) {
-  let start = moment.utc(currentDate).tz(timeZone, true).startOf('day').toDate()
+  // console.warn("GET BOUNDS")
+  // console.warn(value)
+  // console.warn(timeZone)
+  const date = value || new Date(new Date().setHours(0, 0, 0, 0))
+  let start = moment.utc(date).tz(timeZone).startOf('day').toDate()
   let end =  moment(start).add(1, 'days').toDate()
+  // console.warn(date)
 
+  // date parts are equal
   return {
-    min: start,
-    max: end
+    min: min && dates.eq(date, min, 'day')
+      ? min
+      : start,
+    max: max && dates.eq(date, max, 'day')
+      ? max
+      : end,
   }
-  //date parts are equal
-  // return {
-  //   min: dates.eq(value, min, 'day')
-  //     ? dates.merge(start, min, currentDate)
-  //     : start,
-  //   max: dates.eq(value, max, 'day')
-  //     ? dates.merge(start, max, currentDate)
-  //     : end,
-  // }
 }
 
 function getDates({ step, culture, ...props }) {
   let times = []
   let { min, max } = getBounds(props)
-
-
-  // let startDay = dates.date(min)
-
-
-  // while (dates.date(min) === startDay && dates.lte(min, max)) {
-  while (dates.lte(min, max)) {
+  // console.warn("getDates min", min)
+  // console.warn("getDates max", max)
+  while (dates.lt(min, max)) {
     times.push({
       // date: moment.utc(min).tz(props.timeZone, true).toDate(),
       date: moment.utc(min).toDate(),
-      label: moment(min).tz(props.timeZone).format('LT')
+      label: moment.utc(min).tz(props.timeZone).format('LT')
       // label: moment.utc(min).tz(props.timeZone, true).format('LT')
       // label: moment(min).format('LT')
     })
     // min = moment.utc(min).tz(props.timeZone, true).add(step || 30, 'minutes').toDate()
-    min = moment(min).add(step || 30, 'minutes').toDate()
+    min = moment.utc(min).add(step || 30, 'minutes').toDate()
   }
-  console.warn(times)
+
   return times
 }
 

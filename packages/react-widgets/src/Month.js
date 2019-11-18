@@ -1,6 +1,7 @@
 import cn from 'classnames'
 import PropTypes from 'prop-types'
 import React from 'react'
+import moment from 'moment-timezone'
 
 import CalendarView from './CalendarView'
 import dates from './util/dates'
@@ -29,6 +30,7 @@ class MonthView extends React.Component {
     dateFormat: CustomPropTypes.dateFormat,
     footerFormat: CustomPropTypes.dateFormat,
     disabled: PropTypes.bool,
+    timeZone: PropTypes.string,
   }
 
   renderHeaders(week, format, culture) {
@@ -59,6 +61,7 @@ class MonthView extends React.Component {
       footerFormat,
       dateFormat,
       dayComponent: Day,
+      timeZone
     } = this.props
 
     footerFormat = dateLocalizer.getFormat('footer', footerFormat)
@@ -67,8 +70,19 @@ class MonthView extends React.Component {
     return (
       <CalendarView.Row key={rowIdx}>
         {row.map((date, colIdx) => {
-          let formattedDate = dateLocalizer.format(date, dateFormat, culture)
-          let label = dateLocalizer.format(date, footerFormat, culture)
+          // let formattedDate = dateLocalizer.format(date, dateFormat, culture)
+          // let label = dateLocalizer.format(date, footerFormat, culture)
+
+          // console.warn("CalendarView timeZone", timeZone)
+          // console.warn("CalendarView formattedDate original", dateLocalizer.format(date, dateFormat, culture))
+          // console.warn("CalendarView label original", dateLocalizer.format(date, footerFormat, culture))
+          // console.warn("CalendarView formattedDate revision", moment.utc(date).tz(timeZone).format(dateFormat))
+          // console.warn("CalendarView label revision",  moment.utc(date).tz(timeZone).format(footerFormat))
+          // console.warn("CalendarView date", date)
+          // console.warn("CalendarView date proposed 01", moment.utc(date).tz(timeZone).toDate())
+          // console.warn("CalendarView date proposed 02", moment.utc(date).tz(timeZone, true).toDate())
+          let formattedDate = moment.utc(date).tz(timeZone).format(dateFormat)
+          let label = moment.utc(date).tz(timeZone).format(footerFormat)
 
           return (
             <CalendarView.Cell
@@ -98,7 +112,6 @@ class MonthView extends React.Component {
     let { className, focused, culture, activeId, dayFormat } = this.props
     let month = dates.visibleDays(focused, culture)
     let rows = chunk(month, 7)
-
     dayFormat = dateLocalizer.getFormat('weekday', dayFormat)
 
     return (
