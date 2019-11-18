@@ -1,7 +1,5 @@
 lib/
 dist/
-!packages/react-widgets/dist
-!packages/react-widgets/lib
 **/test/output/
 
 temp/
