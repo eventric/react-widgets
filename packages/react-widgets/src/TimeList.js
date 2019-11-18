@@ -7,10 +7,7 @@ import List from './List'
 import dates from './util/dates'
 
 import reduceToListState from './util/reduceToListState'
-import { date as dateLocalizer } from './util/localizers'
 import * as CustomPropTypes from './util/PropTypes'
-
-const format = props => dateLocalizer.getFormat('time', props.format)
 
 const accessors = {
   text: item => item.label,
@@ -22,14 +19,10 @@ const find = (arr, fn) => {
   return null
 }
 
-function getBounds({ min, max, currentDate, timeZone, value }) {
-  // console.warn("GET BOUNDS")
-  // console.warn(value)
-  // console.warn(timeZone)
+function getBounds({ min, max, timeZone, value }) {
   const date = value || new Date(new Date().setHours(0, 0, 0, 0))
   let start = moment.utc(date).tz(timeZone).startOf('day').toDate()
   let end =  moment(start).add(1, 'days').toDate()
-  // console.warn(date)
 
   // date parts are equal
   return {
@@ -42,20 +35,15 @@ function getBounds({ min, max, currentDate, timeZone, value }) {
   }
 }
 
-function getDates({ step, culture, ...props }) {
+function getDates({ step, ...props }) {
   let times = []
   let { min, max } = getBounds(props)
-  // console.warn("getDates min", min)
-  // console.warn("getDates max", max)
+
   while (dates.lt(min, max)) {
     times.push({
-      // date: moment.utc(min).tz(props.timeZone, true).toDate(),
       date: moment.utc(min).toDate(),
       label: moment.utc(min).tz(props.timeZone).format('LT')
-      // label: moment.utc(min).tz(props.timeZone, true).format('LT')
-      // label: moment(min).format('LT')
     })
-    // min = moment.utc(min).tz(props.timeZone, true).add(step || 30, 'minutes').toDate()
     min = moment.utc(min).add(step || 30, 'minutes').toDate()
   }
 

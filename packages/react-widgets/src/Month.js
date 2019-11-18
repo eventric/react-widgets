@@ -55,7 +55,6 @@ class MonthView extends React.Component {
       disabled,
       onChange,
       value,
-      culture,
       min,
       max,
       footerFormat,
@@ -70,17 +69,6 @@ class MonthView extends React.Component {
     return (
       <CalendarView.Row key={rowIdx}>
         {row.map((date, colIdx) => {
-          // let formattedDate = dateLocalizer.format(date, dateFormat, culture)
-          // let label = dateLocalizer.format(date, footerFormat, culture)
-
-          // console.warn("CalendarView timeZone", timeZone)
-          // console.warn("CalendarView formattedDate original", dateLocalizer.format(date, dateFormat, culture))
-          // console.warn("CalendarView label original", dateLocalizer.format(date, footerFormat, culture))
-          // console.warn("CalendarView formattedDate revision", moment.utc(date).tz(timeZone).format(dateFormat))
-          // console.warn("CalendarView label revision",  moment.utc(date).tz(timeZone).format(footerFormat))
-          // console.warn("CalendarView date", date)
-          // console.warn("CalendarView date proposed 01", moment.utc(date).tz(timeZone).toDate())
-          // console.warn("CalendarView date proposed 02", moment.utc(date).tz(timeZone, true).toDate())
           let formattedDate = moment.utc(date).tz(timeZone).format(dateFormat)
           let label = moment.utc(date).tz(timeZone).format(footerFormat)
 

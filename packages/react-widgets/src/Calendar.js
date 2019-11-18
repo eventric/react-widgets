@@ -299,8 +299,6 @@ class Calendar extends React.Component {
     } else if (lastDate !== currentDate) {
       slideDirection = dates.gt(currentDate, lastDate) ? 'left' : 'right'
     }
-    // console.warn("DERIVED STATE currentDate", currentDate)
-    // console.warn("DERIVED STATE value", value)
 
     return {
       view,
@@ -342,7 +340,7 @@ class Calendar extends React.Component {
   handleChange = date => {
     let { views, onChange } = this.props
     let { view } = this.state
-    // console.warn("Calendar/handleChange date", date)
+
     if (views[0] === view) {
       this.maybeSetCurrentDate(date)
 
@@ -444,8 +442,6 @@ class Calendar extends React.Component {
     let elementProps = Props.pickElementProps(this),
       viewProps = Props.pick(this.props, View)
 
-    // console.warn("viewProps")
-    // console.warn(viewProps)
     let isDisabled = disabled || readOnly
 
     return (
@@ -546,12 +542,6 @@ class Calendar extends React.Component {
       min,
       max
     )
-    
-    // console.warn("Calendar/maybeSetCurrentDate currentDate", currentDate)
-    // console.warn("Calendar/maybeSetCurrentDate date", date)
-    // console.warn("Calendar/maybeSetCurrentDate inRangeDate", inRangeDate)
-    // console.warn("Calendar/maybeSetCurrentDate date === currentDate", date === currentDate)
-    // console.warn("Calendar/maybeSetCurrentDate dates.eq", dates.eq(inRangeDate, dateOrNull(currentDate), VIEW_UNIT[view]))
 
     if (
       date === currentDate ||
