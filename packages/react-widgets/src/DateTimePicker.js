@@ -205,7 +205,6 @@ class DateTimePicker extends React.Component {
     time: true,
     open: false,
     timeZone: 'UTC',
-    currentDate: new Date()
   }
 
   constructor(...args) {
@@ -419,6 +418,7 @@ class DateTimePicker extends React.Component {
       popupTransition,
       dropUp,
       onCurrentDateChange,
+      currentDate,
       timeZone
     } = this.props
 
@@ -444,7 +444,7 @@ class DateTimePicker extends React.Component {
           // #75: need to aggressively reclaim focus from the calendar otherwise
           // disabled header/footer buttons will drop focus completely from the widget
           onNavigate={() => this.focus()}
-          currentDate={value}
+          currentDate={currentDate}
           onCurrentDateChange={onCurrentDateChange}
           aria-hidden={!open}
           aria-live="polite"

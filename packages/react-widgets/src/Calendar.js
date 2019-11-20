@@ -534,14 +534,16 @@ class Calendar extends React.Component {
   }
 
   maybeSetCurrentDate(date) {
-    const { min, max } = this.props
+    // const { min, max } = this.props
     const { view, currentDate } = this.state
 
-    let inRangeDate = inRangeValue(
-      date ? new Date(date) : currentDate,
-      min,
-      max
-    )
+    // Remove contraint to fix calendar footer click?
+    // let inRangeDate = inRangeValue(
+    //   date ? new Date(date) : currentDate,
+    //   min,
+    //   max
+    // )
+    let inRangeDate = date ? new Date(date) : currentDate
 
     if (
       date === currentDate ||
