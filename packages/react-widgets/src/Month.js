@@ -60,17 +60,19 @@ class MonthView extends React.Component {
       footerFormat,
       dateFormat,
       dayComponent: Day,
-      timeZone
     } = this.props
 
     footerFormat = dateLocalizer.getFormat('footer', footerFormat)
     dateFormat = dateLocalizer.getFormat('dayOfMonth', dateFormat)
+    const deviceTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+    const localizedMinDate = moment.utc(min).tz(deviceTimeZone, true).toDate()
+    const localizedMaxDate = moment.utc(max).tz(deviceTimeZone, true).toDate()
 
     return (
       <CalendarView.Row key={rowIdx}>
         {row.map((date, colIdx) => {
-          let formattedDate = moment.utc(date).tz(timeZone).format(dateFormat)
-          let label = moment.utc(date).tz(timeZone).format(footerFormat)
+          let formattedDate = moment(date).format(dateFormat)
+          let label = moment(date).format(footerFormat)
 
           return (
             <CalendarView.Cell
@@ -79,8 +81,8 @@ class MonthView extends React.Component {
               label={label}
               date={date}
               now={today}
-              min={min}
-              max={max}
+              min={localizedMinDate}
+              max={localizedMaxDate}
               unit="day"
               viewUnit="month"
               onChange={onChange}

@@ -25,13 +25,14 @@ class DateTimePickerInput extends React.Component {
     readOnly: CustomPropTypes.disabled,
 
     timeZone: PropTypes.string,
-    currentDate: PropTypes.instanceOf(Date)
+    currentDate: PropTypes.instanceOf(Date),
+    isDatePicker: PropTypes.bool,
   }
 
   state = {}
 
   static getDerivedStateFromProps(nextProps, nextState) {
-    let { value, editing, editFormat, format, culture, timeZone } = nextProps
+    let { value, editing, editFormat, format, culture, timeZone, isDatePicker } = nextProps
     let { textValue } = nextState
 
     return {
@@ -41,15 +42,14 @@ class DateTimePickerInput extends React.Component {
         culture,
         timeZone,
         editing,
-        textValue
+        textValue,
+        isDatePicker
       ),
     }
   }
 
-
   componentDidUpdate(prevProps) {
-    let { value, editing, editFormat, format, culture, timeZone } = this.props
-
+    let { value, editing, editFormat, format, culture, timeZone, isDatePicker } = this.props
     if (value && value !== prevProps.value) {
       this.setState({
         textValue: formatDate(
@@ -57,6 +57,9 @@ class DateTimePickerInput extends React.Component {
           editing && editFormat ? editFormat : format,
           culture,
           timeZone,
+          false,
+          null,
+          isDatePicker
         ),
       })
     }
@@ -67,13 +70,17 @@ class DateTimePickerInput extends React.Component {
   }
 
   handleBlur = event => {
-    let { format, culture, parse, onChange, onBlur, timeZone, currentDate } = this.props
+    let { format, culture, parse, onChange, onBlur, timeZone, currentDate, isDatePicker } = this.props
 
     onBlur && onBlur(event)
 
     if (this._needsFlush) {
       let date = parse(event.target.value)
-      date = moment(date).tz(timeZone, true)
+      if (!isDatePicker) {
+        date = moment(date).tz(timeZone, true)
+      } else {
+        date = moment(date)
+      }
 
       const momentCurrentDate = moment.utc(currentDate).tz(timeZone)
 
@@ -85,7 +92,7 @@ class DateTimePickerInput extends React.Component {
       date = date.toDate()
 
       this._needsFlush = false
-      onChange(date, formatDate(date, format, culture, timeZone))
+      onChange(date, formatDate(date, format, culture, timeZone, isDatePicker))
     }
   }
 
@@ -120,14 +127,16 @@ function isValid(d) {
   return !isNaN(d.getTime())
 }
 
-function formatDate(date, format, culture, timeZone, isEditing, textValue) {
+function formatDate(date, format, culture, timeZone, isEditing, textValue, isDatePicker) {
   var val = ''
 
-  if (isEditing){
+  if (isEditing && textValue){
     return textValue
   }
-  if (date instanceof Date && isValid(date)) {
+  if (!isDatePicker && date instanceof Date && isValid(date)) {
     val = moment(date).tz(timeZone).format(format)
+  } else if (isDatePicker && date instanceof Date && isValid(date)) {
+    val = moment.utc(date).startOf('day').format(format)
   }
   return val
 }

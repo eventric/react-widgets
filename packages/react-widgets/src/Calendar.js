@@ -139,7 +139,6 @@ const propTypes = {
    * @example ['prop', ['footer', true]]
    */
   footer: PropTypes.bool,
-  timeZone: PropTypes.string,
 
   /**
    * Provide a custom component to render the days of the month. The Component is provided the following props
@@ -428,7 +427,6 @@ class Calendar extends React.Component {
       max,
       culture,
       tabIndex,
-      timeZone
     } = this.props
 
     let { currentDate, view, slideDirection, focused, messages } = this.state
@@ -487,7 +485,6 @@ class Calendar extends React.Component {
             onChange={this.handleChange}
             onKeyDown={this.handleKeyDown}
             aria-labelledby={this.labelId}
-            timeZone={timeZone}
           />
         </Calendar.Transition>
         {footer && (

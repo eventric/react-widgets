@@ -283,7 +283,7 @@ class DateTimePicker extends React.Component {
   handleDateSelect = date => {
     var format = getFormat(this.props)
     var dateTime = date
-    var dateStr = formatDate(date, format, this.props.culture, this.props.timeZone)
+    var dateStr = formatDate(date, format, this.props.culture, this.props.timeZone, !this.props.time)
 
     this.close()
     notify(this.props.onSelect, [dateTime, dateStr])
@@ -295,7 +295,7 @@ class DateTimePicker extends React.Component {
   handleTimeSelect = datum => {
     var format = getFormat(this.props)
     var dateTime = datum.date
-    var dateStr = formatDate(datum.date, format, this.props.culture, this.props.timeZone)
+    var dateStr = formatDate(datum.date, format, this.props.culture, this.props.timeZone, !this.props.time)
 
     this.close()
     notify(this.props.onSelect, [dateTime, dateStr])
@@ -338,6 +338,7 @@ class DateTimePicker extends React.Component {
       currentDate,
       'aria-labelledby': ariaLabelledby,
       'aria-describedby': ariaDescribedby,
+      time
     } = this.props
 
     let { focused } = this.state
@@ -376,6 +377,7 @@ class DateTimePicker extends React.Component {
         aria-owns={owns}
         timeZone={timeZone}
         currentDate={currentDate}
+        isDatePicker={!time}
       />
     )
   }
@@ -419,9 +421,10 @@ class DateTimePicker extends React.Component {
       dropUp,
       onCurrentDateChange,
       currentDate,
-      timeZone
     } = this.props
 
+    const deviceTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+    const adjustedValue = value ? moment.utc(value).startOf('day').tz(deviceTimeZone, true).toDate() : new Date()
     let calendarProps = Props.pick(this.props, Calendar.ControlledComponent)
     // manually include the last controlled default Props
     calendarProps.defaultView = this.props.defaultView
@@ -438,7 +441,7 @@ class DateTimePicker extends React.Component {
           id={dateId}
           activeId={activeCalendarId}
           tabIndex="-1"
-          value={value}
+          value={adjustedValue}
           autoFocus={false}
           onChange={this.handleDateSelect}
           // #75: need to aggressively reclaim focus from the calendar otherwise
@@ -450,7 +453,6 @@ class DateTimePicker extends React.Component {
           aria-live="polite"
           aria-labelledby={inputId}
           ref={this.attachCalRef}
-          timeZone={timeZone}
         />
       </Popup>
     )
@@ -632,13 +634,13 @@ function getFormat(props) {
       : dateLocalizer.getFormat(isDate ? 'date' : 'time')
 }
 
-function formatDate(date, format, culture, timeZone) {
+function formatDate(date, format, culture, timeZone, isDatePicker) {
   var val = ''
 
-  if (isValid(date)) {
-  // if (date instanceof Date && !isNaN(date.getTime()))
-    // val = dateLocalizer.format(date, format, culture)
+  if (!isDatePicker && isValid(date)) {
     val = moment(date).tz(timeZone).format(format)
+  } else if (isDatePicker && isValid(date)) {
+    val = moment(date).format(format)
   }
 
   return val

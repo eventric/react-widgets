@@ -10,6 +10,7 @@ Input.propTypes = {
   tabIndex: PropTypes.string,
   component: PropTypes.any,
   nodeRef: PropTypes.func,
+  isDatePicker: PropTypes.bool,
 }
 
 function Input({
@@ -23,6 +24,7 @@ function Input({
   component: Component = 'input',
   ...props
 }) {
+  delete(props.isDatePicker)
   return (
     <Component
       {...props}
