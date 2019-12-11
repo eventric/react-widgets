@@ -421,10 +421,12 @@ class DateTimePicker extends React.Component {
       dropUp,
       onCurrentDateChange,
       currentDate,
+      date,
+      time
     } = this.props
 
     const deviceTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
-    const adjustedValue = value ? moment.utc(value).startOf('day').tz(deviceTimeZone, true).toDate() : new Date()
+    const adjustedValue = !value ? new Date() : date && time ? value : moment.utc(value).startOf('day').tz(deviceTimeZone, true).toDate()
     let calendarProps = Props.pick(this.props, Calendar.ControlledComponent)
     // manually include the last controlled default Props
     calendarProps.defaultView = this.props.defaultView
