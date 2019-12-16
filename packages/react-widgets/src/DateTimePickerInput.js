@@ -130,7 +130,7 @@ function isValid(d) {
 function formatDate(date, format, culture, timeZone, isEditing, textValue, isDatePicker) {
   var val = ''
 
-  if (isEditing && textValue){
+  if (isEditing){
     return textValue
   }
   if (!isDatePicker && date instanceof Date && isValid(date)) {
