@@ -27,12 +27,13 @@ class DateTimePickerInput extends React.Component {
     timeZone: PropTypes.string,
     currentDate: PropTypes.instanceOf(Date),
     isDatePicker: PropTypes.bool,
+    isTimePicker: PropTypes.bool,
   }
 
   state = {}
 
   static getDerivedStateFromProps(nextProps, nextState) {
-    let { value, editing, editFormat, format, culture, timeZone, isDatePicker } = nextProps
+    let { value, editing, editFormat, format, culture, timeZone, isDatePicker, isTimePicker, currentDate } = nextProps
     let { textValue } = nextState
 
     return {
@@ -43,13 +44,15 @@ class DateTimePickerInput extends React.Component {
         timeZone,
         editing,
         textValue,
-        isDatePicker
+        isDatePicker,
+        isTimePicker,
+        currentDate
       ),
     }
   }
 
   componentDidUpdate(prevProps) {
-    let { value, editing, editFormat, format, culture, timeZone, isDatePicker } = this.props
+    let { value, editing, editFormat, format, culture, timeZone, isDatePicker, isTimePicker, currentDate } = this.props
     if (value && value !== prevProps.value) {
       this.setState({
         textValue: formatDate(
@@ -59,7 +62,9 @@ class DateTimePickerInput extends React.Component {
           timeZone,
           false,
           null,
-          isDatePicker
+          isDatePicker,
+          isTimePicker,
+          currentDate
         ),
       })
     }
@@ -70,13 +75,13 @@ class DateTimePickerInput extends React.Component {
   }
 
   handleBlur = event => {
-    let { format, culture, parse, onChange, onBlur, timeZone, currentDate, isDatePicker } = this.props
+    let { format, culture, parse, onChange, onBlur, timeZone, currentDate, isDatePicker, isTimePicker } = this.props
 
     onBlur && onBlur(event)
 
     if (this._needsFlush) {
       let date = parse(event.target.value)
-      if (!isDatePicker) {
+      if (isTimePicker) {
         date = moment(date).tz(timeZone, true)
       } else {
         date = moment(date)
@@ -92,7 +97,7 @@ class DateTimePickerInput extends React.Component {
       date = date.toDate()
 
       this._needsFlush = false
-      onChange(date, formatDate(date, format, culture, timeZone, isDatePicker))
+      onChange(date, formatDate(date, format, culture, timeZone, false, null, isDatePicker, isTimePicker, currentDate))
     }
   }
 
@@ -127,16 +132,20 @@ function isValid(d) {
   return !isNaN(d.getTime())
 }
 
-function formatDate(date, format, culture, timeZone, isEditing, textValue, isDatePicker) {
+function formatDate(date, format, culture, timeZone, isEditing, textValue, isDatePicker, isTimePicker, currentDate) {
   var val = ''
 
   if (isEditing){
     return textValue
   }
-  if (!isDatePicker && date instanceof Date && isValid(date)) {
+  if (isTimePicker && !isDatePicker && date instanceof Date && isValid(date)) {
     val = moment(date).tz(timeZone).format(format)
-  } else if (isDatePicker && date instanceof Date && isValid(date)) {
+  } else if (isDatePicker && !isTimePicker && date instanceof Date && isValid(date)) {
     val = moment.utc(date).startOf('day').format(format)
+  } else if (isTimePicker && isDatePicker && date instanceof Date && isValid(date)) {
+    const day = moment(currentDate).format('ll')
+    const time = moment(date).tz(timeZone).format('LT')
+    val = `${day} ${time}`
   }
   return val
 }

@@ -11,6 +11,7 @@ Input.propTypes = {
   component: PropTypes.any,
   nodeRef: PropTypes.func,
   isDatePicker: PropTypes.bool,
+  isTimePicker: PropTypes.bool,
 }
 
 function Input({
@@ -25,6 +26,7 @@ function Input({
   ...props
 }) {
   delete(props.isDatePicker)
+  delete(props.isTimePicker)
   return (
     <Component
       {...props}

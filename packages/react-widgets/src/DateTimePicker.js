@@ -338,6 +338,7 @@ class DateTimePicker extends React.Component {
       currentDate,
       'aria-labelledby': ariaLabelledby,
       'aria-describedby': ariaDescribedby,
+      date,
       time
     } = this.props
 
@@ -377,7 +378,8 @@ class DateTimePicker extends React.Component {
         aria-owns={owns}
         timeZone={timeZone}
         currentDate={currentDate}
-        isDatePicker={!time}
+        isDatePicker={date}
+        isTimePicker={time}
       />
     )
   }
@@ -426,7 +428,7 @@ class DateTimePicker extends React.Component {
     } = this.props
 
     const deviceTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
-    const adjustedValue = !value ? new Date() : date && time ? value : moment.utc(value).startOf('day').tz(deviceTimeZone, true).toDate()
+    const adjustedValue = !value ? new Date() : date && time ? currentDate : moment.utc(value).startOf('day').tz(deviceTimeZone, true).toDate()
     let calendarProps = Props.pick(this.props, Calendar.ControlledComponent)
     // manually include the last controlled default Props
     calendarProps.defaultView = this.props.defaultView
