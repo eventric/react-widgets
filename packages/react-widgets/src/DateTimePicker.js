@@ -280,10 +280,12 @@ class DateTimePicker extends React.Component {
   }
 
   @widgetEditable
-  handleDateSelect = date => {
+  handleDateSelect = selectedDate => {
+    const { timeZone, time, date } = this.props
     var format = getFormat(this.props)
-    var dateTime = date
-    var dateStr = formatDate(date, format, this.props.culture, this.props.timeZone, !this.props.time)
+    const momentDate = selectedDate && moment(selectedDate)
+    var dateTime = time && date ? moment().tz(timeZone, true).year(momentDate.year()).month(momentDate.month()).date(momentDate.date()).toDate() : selectedDate
+    var dateStr = formatDate(dateTime, format, this.props.culture, this.props.timeZone, !this.props.time)
 
     this.close()
     notify(this.props.onSelect, [dateTime, dateStr])
