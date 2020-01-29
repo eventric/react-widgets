@@ -33,7 +33,7 @@ class DateTimePickerInput extends React.Component {
   state = {}
 
   static getDerivedStateFromProps(nextProps, nextState) {
-    let { value, editing, editFormat, format, culture, timeZone, isDatePicker, isTimePicker, currentDate } = nextProps
+    let { value, editing, editFormat, format, culture, timeZone, isDatePicker, isTimePicker } = nextProps
     let { textValue } = nextState
 
     return {
@@ -45,14 +45,13 @@ class DateTimePickerInput extends React.Component {
         editing,
         textValue,
         isDatePicker,
-        isTimePicker,
-        currentDate
+        isTimePicker
       ),
     }
   }
 
   componentDidUpdate(prevProps) {
-    let { value, editing, editFormat, format, culture, timeZone, isDatePicker, isTimePicker, currentDate } = this.props
+    let { value, editing, editFormat, format, culture, timeZone, isDatePicker, isTimePicker } = this.props
     if (value && value !== prevProps.value) {
       this.setState({
         textValue: formatDate(
@@ -63,8 +62,7 @@ class DateTimePickerInput extends React.Component {
           false,
           null,
           isDatePicker,
-          isTimePicker,
-          currentDate
+          isTimePicker
         ),
       })
     }
@@ -132,7 +130,7 @@ function isValid(d) {
   return !isNaN(d.getTime())
 }
 
-function formatDate(date, format, culture, timeZone, isEditing, textValue, isDatePicker, isTimePicker, currentDate) {
+function formatDate(date, format, culture, timeZone, isEditing, textValue, isDatePicker, isTimePicker) {
   var val = ''
 
   if (isEditing){
