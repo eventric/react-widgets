@@ -143,7 +143,7 @@ function formatDate(date, format, culture, timeZone, isEditing, textValue, isDat
   } else if (isDatePicker && !isTimePicker && date instanceof Date && isValid(date)) {
     val = moment.utc(date).startOf('day').format(format)
   } else if (isTimePicker && isDatePicker && date instanceof Date && isValid(date)) {
-    const day = moment(currentDate).format('ll')
+    const day = moment(date).format('ll')
     const time = moment(date).tz(timeZone).format('LT')
     val = `${day} ${time}`
   }
